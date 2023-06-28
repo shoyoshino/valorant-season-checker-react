@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   const [seasons, setSeasons] = useState([]);
-  const [selectedSeason, setSelectedSeason] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState(''); // .season-selectのvalueを管理
   const seasonSelect = useRef(null);
   const seasonStartTimeRef = useRef(null);
   const seasonEndTimeRef = useRef(null);
@@ -30,7 +30,6 @@ function App() {
           if (currentSeason) {
             setSelectedSeason(currentSeason.uuid);
             setSeasonTime(currentSeason);
-            setDaysRemaining();
           }
         });
       });
@@ -43,6 +42,7 @@ function App() {
       // console.log(currentSeason);
       if (currentSeason) {
         setSeasonTime(currentSeason);
+        setDayRemaining(currentSeason);
       }
     }
   }, [selectedSeason, seasons]);
@@ -50,6 +50,7 @@ function App() {
   function handleChange(event) {
     const seasonUuid = event.target.value;
     setSelectedSeason(seasonUuid);
+    setDayRemaining(seasons);
   }
 
   function getCurrentSeason(seasons) {
@@ -97,8 +98,19 @@ function App() {
     seasonEndTimeRef.current.innerText = `${endTimeYear}年${endTimeMonth}月${endTimeDate}日${endTimeDay}曜日`;
   }
 
-  function setDaysRemaining() {
-    console.log('days-remaining');
+  function setDayRemaining(seasons) {
+    const dayRemainingNum =
+      (new Date(seasons.endTime).setHours(0, 0, 0, 0) - new Date(new Date().setHours(0, 0, 0, 0))) /
+      1000 /
+      60 /
+      60 /
+      24;
+
+    if (Math.sign(dayRemainingNum) == 0 || Math.sign(dayRemainingNum) == 1) {
+      dayRemaining.current.innerText = `${dayRemainingNum}日`;
+    } else if (Math.sign(dayRemainingNum) == -1) {
+      dayRemaining.current.innerText = '終了したシーズンです';
+    }
   }
 
   return (
@@ -131,7 +143,7 @@ function App() {
 
           <section className="mt-10">
             <h2 className="season-start-time text-2xl font-bold text-white">シーズン残り日数：</h2>
-            <div className="day-remaining" ref={dayRemaining}></div>
+            <div className="day-remaining text-xl font-bold text-white mt-2" ref={dayRemaining}></div>
           </section>
         </div>
       </div>
