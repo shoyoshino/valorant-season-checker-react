@@ -9,6 +9,7 @@ function App() {
   const seasonEndTimeRef = useRef(null);
   const dayRemaining = useRef(null);
 
+  // ページを開いたときVALORANT APIからシーズン情報を取得
   useEffect(() => {
     fetch('https://valorant-api.com/v1/seasons?language=ja-JP')
       .then((response) => response.json())
@@ -37,9 +38,7 @@ function App() {
 
   useEffect(() => {
     if (selectedSeason) {
-      // currentSeasonだと意味が少し違うかも
       const currentSeason = seasons.find((season) => season.uuid === selectedSeason);
-      // console.log(currentSeason);
       if (currentSeason) {
         setSeasonTime(currentSeason);
         setDayRemaining(currentSeason);
@@ -47,12 +46,14 @@ function App() {
     }
   }, [selectedSeason, seasons]);
 
+  // selectボックスからシーズンを選択したときに発火
   function handleChange(event) {
     const seasonUuid = event.target.value;
     setSelectedSeason(seasonUuid);
     setDayRemaining(seasons);
   }
 
+  // 全シーズンの中から現在のシーズンを見つけて返す
   function getCurrentSeason(seasons) {
     const today = new Date();
     today.setDate(today.getDate() - 1);
@@ -66,6 +67,7 @@ function App() {
     return null;
   }
 
+  // シーズンの開始日時と終了日時を画面にセットする
   function setSeasonTime(seasonData) {
     // ISO8601形式を日本時間に変換
     const startTime = new Date(seasonData.startTime);
@@ -94,10 +96,11 @@ function App() {
     const endTimeDay = dayOfTheWeek[endTimeDayNum];
 
     // HTMLに挿入
-    seasonStartTimeRef.current.innerText = `${startTimeYear}年${startTimeMonth}月${startTimeDate}日${startTimeDay}曜日`;
-    seasonEndTimeRef.current.innerText = `${endTimeYear}年${endTimeMonth}月${endTimeDate}日${endTimeDay}曜日`;
+    seasonStartTimeRef.current.innerText = `${startTimeYear}年${startTimeMonth}月${startTimeDate}日${startTimeDay}曜日から`;
+    seasonEndTimeRef.current.innerText = `${endTimeYear}年${endTimeMonth}月${endTimeDate}日${endTimeDay}曜日まで`;
   }
 
+  // シーズンの残り日数を計算する
   function setDayRemaining(seasons) {
     const dayRemainingNum =
       (new Date(seasons.endTime).setHours(0, 0, 0, 0) - new Date(new Date().setHours(0, 0, 0, 0))) /
